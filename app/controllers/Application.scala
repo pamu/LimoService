@@ -24,15 +24,31 @@ object Application extends Controller {
 
   def mLogin = Action.async(parse.json) { implicit request =>
     request.body.validate[Info] match {
-      case success: JsSuccess[Info] => Future(Ok(""))
+      case success: JsSuccess[Info] => {
+        val info = success.get
+        models.Datastore.getToken(info.email, info.password)
+          .map(token => Future(Ok(info.email + "," + token)))
+          .getOrElse(Future(BadRequest))
+      }
       case error: JsError => Future(BadRequest)
     }
   }
 
   def mSignup = Action.async(parse.json) { implicit request =>
     request.body.validate[Info] match {
-      case success: JsSuccess[Info] => Future(Ok(""))
+      case success: JsSuccess[Info] => {
+        val info = success.get
+        models.Datastore.startVerification(info.email, info.password)
+        Future(Ok("Verification Email Sent"))
+      }
       case error: JsError => Future(BadRequest)
+    }
+  }
+
+  def verify(email: String, rstr: String) = Action.async { implicit request =>
+    Future {
+      models.Datastore.verify(email, rstr)
+      Ok("verification complete")
     }
   }
 

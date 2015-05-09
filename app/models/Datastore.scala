@@ -1,9 +1,15 @@
 package models
 
 import java.security.SecureRandom
+import org.apache.commons.mail.DefaultAuthenticator
+import org.apache.commons.mail.HtmlEmail
+import play.api.Logger
+
 import scala.slick.driver.PostgresDriver.simple._
 import java.net.URI
 import java.sql.Timestamp
+
+import models.Tables._
 
 object Datastore {
   def randomStr: String = BigInt(130, new SecureRandom()).toString(32)
@@ -33,16 +39,44 @@ object Datastore {
     val q = for(user <- users.filter(_.email === email).filter(_.password === password)) yield user
     q.exists.run
   }}
+
+  def getToken(email: String, password: String): Option[String] = db.withSession {implicit sx => {
+    val q = for(user <- users.filter(_.email === email).filter(_.password === password)) yield user.token
+    q.firstOption
+  }}
   
   def startVerification(email: String, password: String): Unit = db.withSession {implicit sx => {
     val now = new Timestamp(new java.util.Date().getTime)
-    verifications += Verification(email, password, false, now)
-    
+    val rstr: String = randomStr
+    verifications += Verification(email, password, rstr, false, now)
+    try {
+      sendHtmlEmail(email, "Verification mail from LimoService", s"""<a href="http://limoservice.herokuapp.com/verify/$email/$rstr">Click to verify your email id for LimoService</a>""")
+    } catch {case ex: _ => Logger.info(s"${ex.getMessage}")}
   } }
   
   def sendHtmlEmail(to: String, subject: String, htmlBody: String): Unit = {
-    
+    val email = new HtmlEmail()
+    email.setHostName("smtp.gmail.com")
+    email.setSmtpPort(465);
+    email.setAuthenticator(new DefaultAuthenticator("reactive999@gmail.com", "palakurthy"))
+    email.setSSLOnConnect(true);
+    email.setFrom("reactive999@gmail.com");
+    email.addTo(to)
+    email.setSubject(subject)
+    email.setHtmlMsg(htmlBody)
+    email.send()
   }
   
-  def verify(email: String, password: String): Boolean = ???
+  def verify(email: String, rstr: String): Boolean = db.withSession { implicit sx => {
+    val q = for(verification <- verifications.filter(_.email === email).filter(_.rstr === rstr)) yield verification
+    val q1 = for(verification <- verifications.filter(_.email === email).filter(_.rstr === rstr)) yield verification.verified
+    if (q.exists.run) {
+      val value = q.first
+      val now = new Timestamp(new java.util.Date().getTime)
+      users += User(value.email, value.password, value.rstr, now)
+      q1.update(true)
+      true
+    } else false
+  }}
+
 }
