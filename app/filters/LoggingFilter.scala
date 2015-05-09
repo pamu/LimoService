@@ -11,6 +11,7 @@ object LoggingFilter extends EssentialFilter {
   override def apply(next: EssentialAction): EssentialAction = new EssentialAction {
     override def apply(v1: RequestHeader): Iteratee[Array[Byte], Result] = {
       Logger.info(s"IP : ${v1.remoteAddress}")
+      next(v1)
     }
   }
 }
