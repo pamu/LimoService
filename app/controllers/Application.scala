@@ -29,10 +29,10 @@ object Application extends Controller {
         val info = success.get
         models.Datastore.getToken(info.email, info.password)
           .map(token => Future(Ok(info.email + "," + token)))
-          .getOrElse(Future(BadRequest))
+          .getOrElse(Ok("No signed up"))
       }
       case error: JsError => {
-        Logger.info("login: "+error.toString)
+        Logger.info("login: "+error.errors.mkString(" "))
         Future(BadRequest)
       }
     }
@@ -42,11 +42,14 @@ object Application extends Controller {
     request.body.validate[Info] match {
       case success: JsSuccess[Info] => {
         val info = success.get
-        models.Datastore.startVerification(info.email, info.password)
-        Future(Ok("Verification Email Sent"))
+        if (!models.Datastore.check(info.email)) {
+          models.Datastore.startVerification(info.email, info.password)
+          Future(Ok("Verification Email Sent"))
+        } else Future(Ok("Email already taken"))
+
       }
       case error: JsError => {
-        Logger.info("signup: "+error.toString)
+        Logger.info("signup: "+error.errors.mkString(" "))
         Future(BadRequest)
       }
     }
