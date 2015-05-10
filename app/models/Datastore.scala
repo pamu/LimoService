@@ -29,6 +29,16 @@ object Datastore {
   val users = TableQuery[Users]
   
   val verifications = TableQuery[Verifications]
+
+  def createInCase = db.withSession { implicit sx => {
+    import scala.slick.jdbc.meta._
+    if (MTable.getTables(userTable).list.isEmpty) {
+      users.ddl.create
+    }
+    if (MTable.getTables(verificationTable).list.isEmpty) {
+      verifications.ddl.create
+    }
+  }}
   
   def check(email: String): Boolean = db.withSession { implicit sx => {
     val q = for(user <- users.filter(_.email === email)) yield user
