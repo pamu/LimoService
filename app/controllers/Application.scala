@@ -1,5 +1,6 @@
 package controllers
 
+import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsPath, Reads}
 import play.api.mvc.{Action, Controller}
 import play.api.libs.functional.syntax._
@@ -30,7 +31,10 @@ object Application extends Controller {
           .map(token => Future(Ok(info.email + "," + token)))
           .getOrElse(Future(BadRequest))
       }
-      case error: JsError => Future(BadRequest)
+      case error: JsError => {
+        Logger.info("login: "+error.toString)
+        Future(BadRequest)
+      }
     }
   }
 
@@ -41,7 +45,10 @@ object Application extends Controller {
         models.Datastore.startVerification(info.email, info.password)
         Future(Ok("Verification Email Sent"))
       }
-      case error: JsError => Future(BadRequest)
+      case error: JsError => {
+        Logger.info("signup: "+error.toString)
+        Future(BadRequest)
+      }
     }
   }
 
