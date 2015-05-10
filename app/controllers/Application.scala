@@ -29,7 +29,7 @@ object Application extends Controller {
         val info = success.get
         models.Datastore.getToken(info.email, info.password)
           .map(token => Future(Ok(info.email + "," + token)))
-          .getOrElse(Ok("No signed up"))
+          .getOrElse(Future(Ok("Please signed up")))
       }
       case error: JsError => {
         Logger.info("login: "+error.errors.mkString(" "))
