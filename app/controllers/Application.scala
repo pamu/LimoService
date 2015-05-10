@@ -22,7 +22,7 @@ object Application extends Controller {
     )(Info.apply _)
 
 
-  def mLogin = Action.async(parse.json) { implicit request =>
+  def mlogin = Action.async(parse.json) { implicit request =>
     request.body.validate[Info] match {
       case success: JsSuccess[Info] => {
         val info = success.get
@@ -34,7 +34,7 @@ object Application extends Controller {
     }
   }
 
-  def mSignup = Action.async(parse.json) { implicit request =>
+  def msignup = Action.async(parse.json) { implicit request =>
     request.body.validate[Info] match {
       case success: JsSuccess[Info] => {
         val info = success.get
