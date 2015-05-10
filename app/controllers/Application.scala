@@ -52,4 +52,7 @@ object Application extends Controller {
     }
   }
 
+  def dummy = Action {
+    Ok("Deployed")
+  }
  }
