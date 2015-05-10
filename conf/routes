@@ -5,7 +5,7 @@
 GET     /                           controllers.Application.index()
 POST    /mlogin                     controllers.Application.mlogin()
 POST    /msignup                    controllers.Application.msignup()
-GET     /verification/:email/:rstr  controllers.Application.verify(email: String, rstr: String)
+GET     /verify/:email/:rstr        controllers.Application.verify(email: String, rstr: String)
 GET     /dummy                      controllers.Application.dummy()
 
 
