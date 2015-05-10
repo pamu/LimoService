@@ -61,7 +61,7 @@ object Datastore {
     verifications += Verification(email, password, rstr, false, now)
     try {
       sendHtmlEmail(email, "Verification mail from LimoService", s"""<a href="http://limoservice.herokuapp.com/verify/$email/$rstr">Click to verify your email id for LimoService</a>""")
-    } catch {case ex: _ => Logger.info(s"${ex.getMessage}")}
+    } catch {case ex: Exception => Logger.info(s"${ex.getMessage}")}
   } }
   
   def sendHtmlEmail(to: String, subject: String, htmlBody: String): Unit = {
