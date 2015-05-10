@@ -14,7 +14,7 @@ import models.Tables._
 object Datastore {
   def randomStr: String = BigInt(130, new SecureRandom()).toString(32)
   
-  val uri = new URI(s""" postgres://jmeyvtvfjtfhoi:EWzz9AIu2LDJAy2e2MXRwqq1eN@ec2-184-73-253-4.compute-1.amazonaws.com:5432/d76h5qq8uua8sh""")
+  val uri = new URI(s"""postgres://jmeyvtvfjtfhoi:EWzz9AIu2LDJAy2e2MXRwqq1eN@ec2-184-73-253-4.compute-1.amazonaws.com:5432/d76h5qq8uua8sh""")
 
   val username = uri.getUserInfo.split(":")(0)
   
