@@ -15,7 +15,7 @@ object LimoGlobal extends GlobalSettings {
   override def onStart(app: Application): Unit = {
     super.onStart(app)
     Logger.info("LimoService Started")
-    models.Datastore.createInCase
+    //models.Datastore.createInCase
   }
 
   override def onStop(app: Application): Unit = {
